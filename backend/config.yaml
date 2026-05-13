@@ -1,0 +1,47 @@
+# Smart Control Platform - Backend 配置模板
+# 真实部署请复制为 config.local.yaml（已 gitignore）并按需修改。
+# 所有字段均可通过环境变量覆盖，前缀 SCP_，嵌套用 _ 分隔，例如：
+#   SCP_SERVER_HTTP_ADDR=:7070
+#   SCP_DATABASE_POSTGRES_DSN=postgres://...
+
+app:
+  name: smart-control
+  env: dev                # dev | staging | prod
+  debug: true
+
+server:
+  http:
+    addr: ":7070"
+    read_timeout: 10s
+    write_timeout: 30s
+    cors:
+      allow_origins: ["*"]
+  tcp:
+    addr: ":8080"         # 下位机 TCP 监听
+    read_timeout: 120s
+  shutdown_timeout: 5s
+
+database:
+  postgres:
+    dsn: "postgres://scp:scp_pwd@127.0.0.1:5432/smart_control?sslmode=disable"
+    max_open_conns: 20
+    max_idle_conns: 5
+    conn_max_lifetime: 1h
+
+log:
+  level: info             # debug | info | warn | error
+  format: console         # console | json
+  file: ""                # 为空则只输出到 stdout
+
+ai:
+  worker_addr: "127.0.0.1:50051"   # Python AI Worker gRPC 地址（Task 6 接入）
+  llm:
+    default: ollama                 # ollama | cloud
+    ollama:
+      base_url: "http://127.0.0.1:11434"
+      model: "qwen2.5:7b"
+    cloud:
+      provider: openai_compatible
+      base_url: "https://api.deepseek.com/v1"
+      model: "deepseek-chat"
+      api_key_env: DEEPSEEK_API_KEY

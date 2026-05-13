@@ -1,0 +1,44 @@
+name: smart-control
+
+# 使用说明：
+#   只起 Postgres:    docker compose up -d postgres
+#   起全部(有代码后): docker compose --profile full up -d
+#
+# Postgres 默认账号 scp / scp_pwd / smart_control
+# 数据持久化到 ./data/pg（已 gitignore）
+
+services:
+  postgres:
+    image: timescale/timescaledb-ha:pg15-latest
+    container_name: scp-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: scp
+      POSTGRES_PASSWORD: scp_pwd
+      POSTGRES_DB: smart_control
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./data/pg:/home/postgres/pgdata/data
+      - ./postgres/init.sql:/docker-entrypoint-initdb.d/00_init.sql:ro
+
+  backend:
+    build:
+      context: ../backend
+    container_name: scp-backend
+    depends_on:
+      - postgres
+    environment:
+      SCP_DATABASE_POSTGRES_DSN: postgres://scp:scp_pwd@postgres:5432/smart_control?sslmode=disable
+    ports:
+      - "7070:7070"
+      - "8080:8080"
+    profiles: ["full"]
+
+  web:
+    build:
+      context: ../web
+    container_name: scp-web
+    ports:
+      - "5173:5173"
+    profiles: ["full"]
