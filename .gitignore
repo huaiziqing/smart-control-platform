@@ -1,0 +1,29 @@
+# Go
+backend/bin/
+backend/*.test
+backend/*.out
+backend/vendor/
+
+# Node
+web/node_modules/
+web/dist/
+web/.vite/
+web/*.local
+
+# Python
+ai-worker/.venv/
+ai-worker/**/__pycache__/
+ai-worker/*.egg-info/
+
+# 环境与密钥
+.env
+.env.local
+*.log
+
+# IDE
+.idea/
+.vscode/
+.DS_Store
+
+# docker 持久化数据
+deploy/data/
